@@ -58,11 +58,13 @@ public class SampleJob {
                 .processor(firstItemProcessor)
                 .writer(jsonFileItemWriter())
                 .faultTolerant()
-                .skip(Throwable.class) //In case we don't know which exception is going to be thrown then best is to use throwable class
+                .skip(Throwable.class) //TODO In case we don't know which exception is going to be thrown then best is to use throwable class
                 //.skip(FlatFileParseException.class)
-                //.skipLimit(2)
-                .skipPolicy(new AlwaysSkipItemSkipPolicy()) //In case we want to skip all the bad records use this
+                .skipLimit(10) //TODO In case we don't know which exception is going to be thrown then best is to use throwable class
+                //.skipPolicy(new AlwaysSkipItemSkipPolicy()) //TODO In case we want to skip all the bad records use this
                 //.listener(skipListener)
+                .retryLimit(3) //TODO retryLimit() can only be applied on ItemWriter and ItemProcessor if value is 3, then ItemWriter will retry 4 times total and ItemProcessor will retry value-1 which is 3 times total
+                .retry(Throwable.class) //TODO retryLimit() is for how many times and retry() is for which error class it will retry
                 .listener(skipListenerImpl)
                 .build();
     }
@@ -98,8 +100,10 @@ public class SampleJob {
             @Override
             public String doWrite(Chunk<? extends StudentJson> items) {
                 items.getItems().forEach(item->{
-                    if (item.getId()==3)
+                    if (item.getId()==3) {
+                        System.out.println("Inside item writer");
                         throw new NullPointerException();
+                    }
                 });
                 return super.doWrite(items);
             }
