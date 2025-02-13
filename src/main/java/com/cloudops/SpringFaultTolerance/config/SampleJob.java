@@ -1,6 +1,7 @@
 package com.cloudops.SpringFaultTolerance.config;
 
 import com.cloudops.SpringFaultTolerance.listener.SkipListener;
+import com.cloudops.SpringFaultTolerance.listener.SkipListenerImpl;
 import com.cloudops.SpringFaultTolerance.model.StudentCsv;
 import com.cloudops.SpringFaultTolerance.model.StudentJson;
 import com.cloudops.SpringFaultTolerance.processor.FirstItemProcessor;
@@ -39,6 +40,9 @@ public class SampleJob {
     @Autowired
     SkipListener skipListener;
 
+    @Autowired
+    SkipListenerImpl skipListenerImpl;
+
     @Bean
     public Job firstJob(){
         return new JobBuilder("firstJob",jobRepository)
@@ -58,7 +62,8 @@ public class SampleJob {
                 //.skip(FlatFileParseException.class)
                 //.skipLimit(2)
                 .skipPolicy(new AlwaysSkipItemSkipPolicy()) //In case we want to skip all the bad records use this
-                .listener(skipListener)
+                //.listener(skipListener)
+                .listener(skipListenerImpl)
                 .build();
     }
 
