@@ -11,6 +11,7 @@ import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.core.step.skip.AlwaysSkipItemSkipPolicy;
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper;
 import org.springframework.batch.item.file.mapping.DefaultLineMapper;
@@ -86,7 +87,18 @@ public class SampleJob {
 
     public JsonFileItemWriter<StudentJson> jsonFileItemWriter(){
         FileSystemResource fileSystemResource = new FileSystemResource("D:\\Spring Projects\\Spring Batch Projects\\SpringFaultTolerance\\src\\main\\java\\com\\cloudops\\SpringFaultTolerance\\input\\student.json");
-        JsonFileItemWriter<StudentJson> jsonItemWriter =new JsonFileItemWriter<>(fileSystemResource, new JacksonJsonObjectMarshaller<StudentJson>());
+        JsonFileItemWriter<StudentJson> jsonItemWriter =new JsonFileItemWriter<>(fileSystemResource, new JacksonJsonObjectMarshaller<StudentJson>()){
+
+            //TODO explicitly written to throw exception in 3rd record
+            @Override
+            public String doWrite(Chunk<? extends StudentJson> items) {
+                items.getItems().forEach(item->{
+                    if (item.getId()==3)
+                        throw new NullPointerException();
+                });
+                return super.doWrite(items);
+            }
+        };
         return jsonItemWriter;
     }
 }

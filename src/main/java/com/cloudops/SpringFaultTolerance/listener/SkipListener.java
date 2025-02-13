@@ -1,8 +1,10 @@
 package com.cloudops.SpringFaultTolerance.listener;
 
 import com.cloudops.SpringFaultTolerance.model.StudentCsv;
+import com.cloudops.SpringFaultTolerance.model.StudentJson;
 import org.springframework.batch.core.annotation.OnSkipInProcess;
 import org.springframework.batch.core.annotation.OnSkipInRead;
+import org.springframework.batch.core.annotation.OnSkipInWrite;
 import org.springframework.batch.item.file.FlatFileParseException;
 import org.springframework.stereotype.Component;
 
@@ -25,6 +27,12 @@ public class SkipListener {
     public void skipProcess(StudentCsv studentCsv, Throwable th){
         createFile("D:\\Spring Projects\\Spring Batch Projects\\SpringFaultTolerance\\src\\main\\java\\com\\cloudops\\SpringFaultTolerance\\input\\processor\\SkipInProcess.txt",
                 studentCsv.toString());
+    }
+
+    @OnSkipInWrite
+    public void skipWrite(StudentJson studentJson, Throwable th){
+        createFile("D:\\Spring Projects\\Spring Batch Projects\\SpringFaultTolerance\\src\\main\\java\\com\\cloudops\\SpringFaultTolerance\\input\\writer\\SkipInWriter.txt",
+                studentJson.toString());
     }
 
     public void createFile(String filePath, String data){
